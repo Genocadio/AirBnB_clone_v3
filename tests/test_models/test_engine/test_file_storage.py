@@ -113,3 +113,45 @@ class TestFileStorage(unittest.TestCase):
         with open("file.json", "r") as f:
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
+
+
+class TestGet(unittest.TestCase):
+    """Test the get method"""
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get(self):
+        """Test that get returns the proper object"""
+        new_state = State(name="Kigali")
+        models.storage.new(new_state)
+        models.storage.save()
+        state_id = new_state.id
+        self.assertIs(models.storage.get(State, state_id), new_state)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get_no_class(self):
+        """Test that get with no class returns None"""
+        self.assertIs(models.storage.get(None, None), None)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get_no_id(self):
+        """Test that get with no id returns None"""
+        self.assertIs(models.storage.get(None, None), None)
+
+
+class TestCount(unittest.TestCase):
+    """Test the count method"""
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_count(self):
+        """Test that count returns the proper number of objects"""
+        count = models.storage.count()
+        new_state = State(name="Kigali")
+        models.storage.new(new_state)
+        models.storage.save()
+        self.assertEqual(models.storage.count(), count + 1)
+        new_city = City(name="Ruhengeri", state_id=new_state.id)
+        models.storage.new(new_city)
+        models.storage.save()
+        self.assertEqual(models.storage.count(), count + 2)
+        new_user = User(email="yvesgeno@outlook.com", password="12345")
+        models.storage.new(new_user)
+        models.storage.save()
+        self.assertEqual(models.storage.count(), count + 3)

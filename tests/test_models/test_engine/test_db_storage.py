@@ -86,3 +86,56 @@ class TestFileStorage(unittest.TestCase):
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_save(self):
         """Test that save properly saves objects to file.json"""
+
+
+class TestGet(unittest.TestCase):
+    """Test the get method"""
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get(self):
+        """Test that get returns the proper object"""
+        new_state = State(name="KIgali")
+        models.storage.new(new_state)
+        models.storage.save()
+        state_id = new_state.id
+        self.assertIs(models.storage.get(State, state_id), new_state)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get_no_class(self):
+        """Test that get with no class returns None"""
+        self.assertIs(models.storage.get(None, None), None)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get_no_id(self):
+        """Test that get with no id returns None"""
+        self.assertIs(models.storage.get(None, None), None)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get_wrong_class(self):
+        """Test that get with wrong class returns None"""
+        self.assertIs(models.storage.get("State", None), None)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get_wrong_id(self):
+        """Test that get with wrong id returns None"""
+        self.assertIs(models.storage.get(None, "12345"), None)
+
+
+class TestCount(unittest.TestCase):
+    """Test the count method"""
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count(self):
+        """Test that count returns the proper number of objects in storage"""
+        count = models.storage.count()
+        new_state = State(name="Kigali")
+        models.storage.new(new_state)
+        models.storage.save()
+        self.assertIs(models.storage.count(), count + 1)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count_cls(self):
+        """Test that count returns the proper number of objects in storage"""
+        count = models.storage.count(State)
+        new_state = State(name="Kigali")
+        models.storage.new(new_state)
+        models.storage.save()
+        self.assertIs(models.storage.count(State), count + 1)
